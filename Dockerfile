@@ -1,7 +1,7 @@
 FROM python:3.6
 
 # Superset version
-ARG SUPERSET_VERSION=0.28.1
+ARG SUPERSET_VERSION=0.29.0rc7
 
 # Configure environment
 ENV GUNICORN_BIND=0.0.0.0:8088 \
@@ -16,6 +16,8 @@ ENV GUNICORN_BIND=0.0.0.0:8088 \
     SUPERSET_VERSION=${SUPERSET_VERSION} \
     SUPERSET_HOME=/var/lib/superset
 ENV GUNICORN_CMD_ARGS="--workers ${GUNICORN_WORKERS} --timeout ${GUNICORN_TIMEOUT} --bind ${GUNICORN_BIND} --limit-request-line ${GUNICORN_LIMIT_REQUEST_LINE} --limit-request-field_size ${GUNICORN_LIMIT_REQUEST_FIELD_SIZE}"
+
+COPY requirements.txt /tmp/requirements.txt
 
 # Create superset user & install dependencies
 RUN useradd -U -m superset && \
@@ -37,8 +39,8 @@ RUN useradd -U -m superset && \
         libssl-dev && \
     apt-get clean && \
     rm -r /var/lib/apt/lists/* && \
-    curl https://raw.githubusercontent.com/${SUPERSET_REPO}/${SUPERSET_VERSION}/requirements.txt -o requirements.txt && \
-    pip install --no-cache-dir -r requirements.txt && \
+    #curl https://raw.githubusercontent.com/${SUPERSET_REPO}/${SUPERSET_VERSION}/requirements.txt -o requirements.txt && \
+    pip install --no-cache-dir -r /tmp/requirements.txt && \
     pip install --no-cache-dir \
         Werkzeug==0.12.1 \
         flask-cors==3.0.3 \
